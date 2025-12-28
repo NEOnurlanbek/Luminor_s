@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/luminor-api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/luminor-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/luminor-api",
+  "projects": {
+    "luminor-batch": {
+      "type": "application",
+      "root": "apps/luminor-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/luminor-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/luminor-batch/tsconfig.app.json"
+      }
+    },
+    "luminor-api": {
+      "type": "application",
+      "root": "apps/luminor-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/luminor-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/luminor-api/tsconfig.app.json"
+      }
+    }
   }
 }
