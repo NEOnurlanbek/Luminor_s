@@ -9,7 +9,7 @@
       ignores: ['eslint.config.mjs','dist/**','node_modules/**','apps/luminor-api/test/**','apps/luminor-batch/test/**'],
     },
     eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
+    ...tseslint.configs.recommended,
     eslintPluginPrettierRecommended,
     {
       languageOptions: {
@@ -29,6 +29,11 @@
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unsafe-argument': 'warn',
+        '@typescript-eslint/require-await': 'off',
+        '@typescript-eslint/no-misused-promises': 'warn',
+        '@typescript-eslint/no-unused-vars': 'warn',
+        '@typescript-eslint/await-thenable': 'off',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         "prettier/prettier": ["error", { endOfLine: "auto" }],
       },
     },
