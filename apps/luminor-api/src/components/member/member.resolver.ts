@@ -9,14 +9,13 @@ export class MemberResolver {
   @Mutation(() => Member)
   public async signup(@Args('input') input: MemberInput): Promise<Member> {
     console.log('Mutation: sugnup');
-    console.log('signup input', input);
+    console.log('signup input:', input);
     return await this.memberService.signup(input);
   }
 
   @Mutation(() => Member)
   public async login(@Args('input') input: LoginInput): Promise<Member> {
     console.log('Mutation: login');
-    console.log('Login input', input);
     return await this.memberService.login(input);
   }
 
