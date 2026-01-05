@@ -28,4 +28,17 @@ export class MemberResolver {
   public async getMember(): Promise<string> {
     return await this.memberService.getMember();
   }
+
+  /** ADMIN */
+
+  //AUTH
+  @Mutation(() => String)
+  public async getAllMembersByAdmin(): Promise<string> {
+    return await this.memberService.getAllMembersByAdmin();
+  }
+
+  @Mutation(() => String)
+  public async updateMemberByAdmin(): Promise<string> {
+    return await this.memberService.updateMemberByAdmin();
+  }
 }
