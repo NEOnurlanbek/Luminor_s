@@ -8,6 +8,7 @@ import { shapeIntoMongoObjectId } from '../../libs/config';
 @Injectable()
 export class AuthService {
   constructor(private jwtServer: JwtService) {}
+
   public async hashPassword(memberPassword: string): Promise<string> {
     const solt = await bcrypt.genSalt();
     return await bcrypt.hash(memberPassword, solt);
