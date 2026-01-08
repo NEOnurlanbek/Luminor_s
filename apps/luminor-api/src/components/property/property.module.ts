@@ -4,12 +4,15 @@ import { PropertyService } from './property.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
+import { MemberModule } from '../member/member.module';
+import PropertySchema from '../../schemas/Property.model';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Property', schema: PropertyModule }]), 
+    MongooseModule.forFeature([{ name: 'Property', schema: PropertySchema }]), 
     AuthModule, 
-    ViewModule
+    ViewModule,
+    MemberModule,
   ],
 
   providers: [PropertyResolver, PropertyService],
