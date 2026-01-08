@@ -1,4 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
-export class PropertyService {}
+export class PropertyService {
+    constructor(@InjectModel('Property')
+    private readonly prpertyModel: Model<string>
+) {}
+
+public async createProperty(): Promise<string> {
+    return ""
+}
+}
