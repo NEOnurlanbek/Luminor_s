@@ -62,7 +62,7 @@ export class MemberService {
     return result;
   }
 
-  public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
+  public async getMember(memberId: ObjectId | null, targetId: ObjectId): Promise<Member> {
     const search: T = {
       _id: targetId,
       memberStatus: {
@@ -70,7 +70,6 @@ export class MemberService {
       },
     };
     const targetMember = await this.memberModel.findOne(search).lean().exec();
-    console.log('targetMember', targetMember);
     if (!targetMember) {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     }
@@ -145,7 +144,6 @@ export class MemberService {
   }
 
   public async memberStatsEditor(input: StatisticModifier): Promise<Member | null> {
-    console.log('memberStatsEditor');
     const { _id, targetKey, modifier } = input;
 
     const result = await this.memberModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true });

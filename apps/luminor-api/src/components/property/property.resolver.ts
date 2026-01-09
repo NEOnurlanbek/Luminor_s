@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PropertyService } from './property.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -8,6 +8,9 @@ import { UseGuards } from '@nestjs/common';
 import { Property } from '../../libs/dto/property/property';
 import { PropertyInput } from '../../libs/dto/property/property.input';
 import type { ObjectId } from 'mongoose';
+import { shapeIntoMongoObjectId } from '../../libs/config';
+import { WithoutGuard } from '../auth/guards/without.guard';
+import { PropertyUpdate } from '../../libs/dto/property/property.update';
 
 @Resolver()
 export class PropertyResolver {
@@ -16,9 +19,32 @@ export class PropertyResolver {
   @Roles(MemberType.AGENT)
   @UseGuards(AuthGuard)
   @Mutation(() => Property)
-  public async createProperty(@Args('input') input: PropertyInput, @AuthMember('_id') memberId: ObjectId): Promise<Property> {
+  public async createProperty(
+    @Args('input') input: PropertyInput,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Property> {
     console.log('Mutation: createProperty');
     input.memberId = memberId;
     return await this.propertyService.createProperty(input);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Property)
+  public async getProperty(@Args('input') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Property> {
+    console.log('Query: getProperty');
+    console.log('input', input);
+    const propertyId = await shapeIntoMongoObjectId(input);
+    console.log('propertyId', propertyId);
+    const result = await this.propertyService.getProperty(memberId, propertyId);
+    return result;
+  }
+
+  @Roles(MemberType.AGENT)
+  @UseGuards(AuthGuard)
+  @Mutation(() => Property)
+  public async updateProperty(@Args('input') input: PropertyUpdate, @AuthMember('_id') memberId: ObjectId): Promise<Property>{
+    console.log('Mutation: updateProperty');
+    input._id = await shapeIntoMongoObjectId(input._id);
+    return await this.propertyService.updateProperty(input, memberId)
   }
 }
