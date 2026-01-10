@@ -52,7 +52,7 @@ export class MemberResolver {
   @UseGuards(RolesGuard)
   @Query(() => String)
   public async checkAuthRolsGuard(@AuthMember() authMember: Member) {
-    return `Hi ${authMember.memberNick}, you are ${authMember.memberType} `;
+    return `Hi ${authMember.memberNick}, you are ${authMember.memberType}, _Id ${authMember._id} `;
   }
 
   @UseGuards(WithoutGuard)
