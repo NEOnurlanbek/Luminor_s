@@ -6,7 +6,12 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInqury, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import {
+  AgentPropertiesInqury,
+  AllPropertiesInquiry,
+  PropertiesInquiry,
+  PropertyInput,
+} from '../../libs/dto/property/property.input';
 import type { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
@@ -42,25 +47,47 @@ export class PropertyResolver {
   @Roles(MemberType.AGENT)
   @UseGuards(AuthGuard)
   @Mutation(() => Property)
-  public async updateProperty(@Args('input') input: PropertyUpdate, @AuthMember('_id') memberId: ObjectId): Promise<Property>{
+  public async updateProperty(
+    @Args('input') input: PropertyUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Property> {
     console.log('Mutation: updateProperty');
     input._id = await shapeIntoMongoObjectId(input._id);
-    return await this.propertyService.updateProperty(input, memberId)
+    return await this.propertyService.updateProperty(input, memberId);
   }
 
   @UseGuards(WithoutGuard)
   @Query(() => Properties)
-  public async getProperties(@Args('input') input: PropertiesInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Properties> {
+  public async getProperties(
+    @Args('input') input: PropertiesInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
     console.log('Query : getProperties');
 
-    return await this.propertyService.getProperties(memberId, input)
+    return await this.propertyService.getProperties(memberId, input);
   }
 
   @Roles(MemberType.AGENT)
   @UseGuards(AuthGuard)
   @Query(() => Properties)
-  public async getAgentProperties(@Args('input') input: AgentPropertiesInqury, @AuthMember('_id') memberId: ObjectId):Promise<Properties> {
+  public async getAgentProperties(
+    @Args('input') input: AgentPropertiesInqury,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
     console.log('Query: getAgentProperties');
-    return await this.propertyService.getAgentProperties(memberId, input)
+    return await this.propertyService.getAgentProperties(memberId, input);
+  }
+
+  /** ADMIN */
+
+  @Roles(MemberType.ADMIN)
+  @UseGuards(AuthGuard)
+  @Query(() => Properties)
+  public async getAllPropertiesByAdmin(
+    @Args('input') input: AllPropertiesInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
+    console.log('Query: AllPropertiesInquriry');
+    return await this.propertyService.getAllPropertiesByAdmin(input)
   }
 }
