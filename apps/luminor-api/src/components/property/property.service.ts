@@ -11,7 +11,7 @@ import {
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { StatisticModifier, T } from '../../libs/types/common';
-import { PropertyStatus } from '../../libs/enums/property.enum';
+import { PropertyStatus, PropertyType } from '../../libs/enums/property.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
@@ -222,5 +222,12 @@ export class PropertyService {
     const { _id, targetKey, modifier } = input;
 
     return await this.propertyModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+  }
+
+  public async removePropertyByAdmin(propertyId: ObjectId): Promise<Property>{
+    const search: T = {_id: propertyId , propertyStatus: PropertyStatus.DELETE}
+    const result = await this.propertyModel.findOneAndDelete(search).exec();
+    if(!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+    return result;
   }
 }
