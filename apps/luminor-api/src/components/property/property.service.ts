@@ -62,13 +62,15 @@ export class PropertyService {
   }
 
   public async updateProperty(input: PropertyUpdate, memberId: ObjectId): Promise<Property> {
-    console.log('in---: ', input);
-    let { propertyStatus, soldAt, deletedAt } = input;
+    let { soldAt, deletedAt } = input;
     console.log('soldAt', soldAt);
     const search: T = { _id: input._id, memberId: memberId, propertyStatus: PropertyStatus.ACTIVE };
 
-    if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
-    else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
+    if (input.propertyStatus === PropertyStatus.SOLD) {
+      input.soldAt = moment().toDate();
+    } else if (input.propertyStatus === PropertyStatus.DELETE) {
+      input.deletedAt = moment().toDate();
+    }
 
     const result = await this.propertyModel.findByIdAndUpdate(search, input, { new: true });
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
@@ -196,6 +198,24 @@ export class PropertyService {
     if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     return result[0];
+  }
+
+  public async updatePropertyByAdmin(input: PropertyUpdate): Promise<Property> {
+    let { soldAt, deletedAt } = input;
+    const match: T = { _id: input._id, propertyStatus: PropertyStatus.ACTIVE };
+
+    if (input.propertyStatus === PropertyStatus.SOLD) {
+      input.soldAt = moment().toDate();
+    } else if (input.propertyStatus === PropertyStatus.DELETE) {
+      input.deletedAt = moment().toDate();
+    }
+
+    const result = await this.propertyModel.findOneAndUpdate(match, input, { new: true }).exec();
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
+    if (soldAt || deletedAt) {
+      await this.memberService.memberStatsEditor({ _id: result.memberId, targetKey: 'memberProperties', modifier: -1 });
+    }
+    return result;
   }
 
   public async propertyStatsEditor(input: StatisticModifier): Promise<Property | null> {

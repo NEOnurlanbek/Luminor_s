@@ -16,13 +16,14 @@ import type { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Resolver()
 export class PropertyResolver {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Roles(MemberType.AGENT)
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
   @Mutation(() => Property)
   public async createProperty(
     @Args('input') input: PropertyInput,
@@ -45,7 +46,7 @@ export class PropertyResolver {
   }
 
   @Roles(MemberType.AGENT)
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
   @Mutation(() => Property)
   public async updateProperty(
     @Args('input') input: PropertyUpdate,
@@ -68,7 +69,7 @@ export class PropertyResolver {
   }
 
   @Roles(MemberType.AGENT)
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
   @Query(() => Properties)
   public async getAgentProperties(
     @Args('input') input: AgentPropertiesInqury,
@@ -81,13 +82,21 @@ export class PropertyResolver {
   /** ADMIN */
 
   @Roles(MemberType.ADMIN)
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
   @Query(() => Properties)
   public async getAllPropertiesByAdmin(
     @Args('input') input: AllPropertiesInquiry,
-    @AuthMember('_id') memberId: ObjectId,
   ): Promise<Properties> {
     console.log('Query: AllPropertiesInquriry');
     return await this.propertyService.getAllPropertiesByAdmin(input)
+  }
+
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Property)
+  public async updatePropertyByAdmin(@Args("input") input: PropertyUpdate): Promise<Property> {
+    console.log('Mutation: updatePropertyByAdmin');
+    input._id = shapeIntoMongoObjectId(input._id)
+    return await this.propertyService.updatePropertyByAdmin(input)
   }
 }
