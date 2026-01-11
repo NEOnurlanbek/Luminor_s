@@ -4,7 +4,7 @@ import { BoardArticleCategory, BoardArticleStatus } from '../../enums/board-arti
 import { IsOptional, Length } from 'class-validator';
 
 @InputType()
-export class BoardArticle {
+export class BoardArticleUpdate {
   @Field(() => String)
   _id: ObjectId;
 
