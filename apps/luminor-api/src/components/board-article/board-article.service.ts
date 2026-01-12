@@ -2,7 +2,11 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
-import { BoardArticleInput, BoardArticlesInquiry } from '../../libs/dto/board-article/board-article.input';
+import {
+  AllBoardArticlesInquiry,
+  BoardArticleInput,
+  BoardArticlesInquiry,
+} from '../../libs/dto/board-article/board-article.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
@@ -74,26 +78,63 @@ export class BoardArticleService {
 
     return result;
   }
-  public async getBoardArticles(
-    input: BoardArticlesInquiry
-  ): Promise<BoardArticles> {
+  public async getBoardArticles(input: BoardArticlesInquiry): Promise<BoardArticles> {
     const { articleCategory, text, memberId } = input.search;
-    
+
     // Match
-    const match: T = { 
-      articleStatus: BoardArticleStatus.ACTIVE 
+    const match: T = {
+      articleStatus: BoardArticleStatus.ACTIVE,
     };
-    
+
     if (articleCategory) match.articleCategory = articleCategory;
     if (text) match.articleTitle = { $regex: new RegExp(text, 'i') };
     if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-  
+
     // Sort
-    const sort: T = { 
-      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC 
+    const sort: T = {
+      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
     };
-  
+
     // Aggregate
+    const result = await this.boardArticleModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupMember,
+              { $unwind: '$memberData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result?.length) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
+
+    return result[0];
+  }
+
+  /** ADMIN */
+  public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
+    const { articleCategory, articleStatus } = input.search;
+
+    //match
+    const match: T = {};
+
+    if (articleCategory) match.articleCategory = articleCategory;
+    if (articleStatus) match.articleStatus = articleStatus;
+
+    //sort
+    const sort = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+    //aggregate
     const result = await this.boardArticleModel.aggregate([
       { $match: match },
       { $sort: sort },
@@ -103,20 +144,40 @@ export class BoardArticleService {
             { $skip: (input.page - 1) * input.limit },
             { $limit: input.limit },
             lookupMember,
-            { $unwind: '$memberData' }
+            { $unwind: '$memberData' },
           ],
-          metaCounter: [{ $count: 'total' }]
-        }
-      }
+          metaCounter: [{ $count: 'total' }],
+        },
+      },
     ]).exec();
-  
-    if (!result?.length) {
-      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-    }
-  
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
     return result[0];
   }
 
+  public async updateBoardArticleByAdmin(input: BoardArticleUpdate): Promise<BoardArticle> {
+    const { _id, ...updateData } = input;
+    const search: T = {_id: _id, articleStatus: BoardArticleStatus.ACTIVE};
+    const result = await this.boardArticleModel.findOneAndUpdate(search, updateData, {new:true}).exec();
+    if(!result) throw new InternalServerErrorException(Message.UPDATE_FALED)
+    if(result.articleStatus === BoardArticleStatus.DELETE) await this.memberService.memberStatsEditor({
+        _id: result.memberId,
+        targetKey: 'memberArticles',
+        modifier: -1,
+      });
+
+      return result;
+  }
+
+  public async removeBoardArticleByAdmin(articleId: ObjectId): Promise<BoardArticle> {
+    const search = {_id: articleId, articleStatus: BoardArticleStatus.DELETE};
+    const result = await this.boardArticleModel.findOneAndDelete(search).exec();
+    if(!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+    return result;
+  }
+
+
+  /** 8888888888888888888888888888888888888 */
   public async articleStatsEditor(input: StatisticModifier): Promise<BoardArticle | null> {
     const { _id, targetKey, modifier } = input;
     return await this.boardArticleModel
