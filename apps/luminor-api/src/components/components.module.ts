@@ -5,8 +5,9 @@ import { AuthModule } from './auth/auth.module';
 import { ViewModule } from './view/view.module';
 import { BoardArticleModule } from './board-article/board-article.module';
 import { CommentModule } from './comment/comment.module';
+import { LikeModule } from './like/like.module';
 @Module({
-  imports: [MemberModule, PropertyModule, AuthModule, ViewModule, BoardArticleModule, CommentModule],
+  imports: [MemberModule, PropertyModule, AuthModule, ViewModule, BoardArticleModule, CommentModule, LikeModule],
   exports: [MemberModule],
 })
 export class ComponentsModule {}
