@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Query, Mutation, Resolver } from '@nestjs/graphql';
 import { CommentService } from './comment.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -9,6 +9,9 @@ import type { ObjectId } from 'mongoose';
 import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { MemberType } from '../../libs/enums/member.enum';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Resolver()
 export class CommentResolver {
@@ -36,10 +39,19 @@ export class CommentResolver {
   }
 
   @UseGuards(WithoutGuard)
-  @Mutation(() => Comments)
+  @Query(() => Comments)
   public async getComments(@Args('input') input: CommentsInquiry): Promise<Comments> {
-    console.log('Mutation: getComments');
+    console.log('Query: getComments');
     input.search.commentRefId = shapeIntoMongoObjectId(input?.search?.commentRefId);
     return await this.commentService.getComments(input);
+  }
+  /** Admin */
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Comment)
+  public async removeCommentByAdmin(@Args('commentId') input: string): Promise<Comment> {
+    console.log('Mutation: removeCommentByAdmin');
+    const commentId = shapeIntoMongoObjectId(input);
+    return await this.commentService.removeCommentByAdmin(commentId);
   }
 }
