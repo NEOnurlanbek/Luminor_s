@@ -15,6 +15,7 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { GraphQLUpload, FileUpload} from 'graphql-upload'
 import { createWriteStream } from 'fs';
 import { Message } from '../../libs/enums/common.enum';
+import { Like } from '../../libs/dto/like/like';
 
 @Resolver()
 export class MemberResolver {
@@ -67,6 +68,14 @@ export class MemberResolver {
   public async getAgents(@Args('input') input: AgentsInpuiry, @AuthMember('_id') memberId: ObjectId ): Promise<Members> {
     console.log('Query: getAgents')
     return this.memberService.getAgents(memberId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Member)
+  public async likeTargetMember(@Args('memberId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Member> {
+    console.log('Mutation: likeTargetMember');
+    const likeRefId = shapeIntoMongoObjectId(input)
+    return await this.memberService.likeTargetMember(memberId, likeRefId)
   }
 
   /** ADMIN */

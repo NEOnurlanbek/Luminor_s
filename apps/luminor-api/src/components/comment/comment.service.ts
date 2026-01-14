@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Comment, Comments } from '../../libs/dto/comment/comment';
@@ -29,7 +29,7 @@ export class CommentService {
       result = await this.commentModel.create(input);
     } catch (err) {
       console.log('Error, Service model', err);
-      throw new InternalServerErrorException(Message.CREATE_FAILED);
+      throw new BadRequestException(Message.CREATE_FAILED);
     }
     switch (result.commentGroup) {
       case CommentGroup.PROPERTY:
