@@ -56,6 +56,9 @@ export class BoardArticleService {
         await this.articleStatsEditor({ _id: articleId, targetKey: 'articleViews', modifier: 1 });
         result.articleViews++;
       }
+      //like
+      const likeInput = {memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE};
+      result.meLiked = await this.likeService.checkLikeExistence(likeInput)
     }
     result.memberData = await this.memberService.getMember(null, result.memberId);
 

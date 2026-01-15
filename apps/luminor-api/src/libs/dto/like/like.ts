@@ -12,6 +12,7 @@ export class MeLiked {
 
 	@Field(() => Boolean)
 	myFavorite: boolean;
+	
 }
 
 @ObjectType()

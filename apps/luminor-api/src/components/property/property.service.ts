@@ -59,6 +59,10 @@ export class PropertyService {
         await this.propertyStatsEditor({ _id: propertyId, targetKey: 'propertyViews', modifier: 1 });
         targetProperty.propertyViews++;
       }
+
+      const likeInput = {memberId: memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY};
+      
+      targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput)
     }
 
     targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
