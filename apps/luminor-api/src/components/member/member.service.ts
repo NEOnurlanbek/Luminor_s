@@ -13,12 +13,13 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 
 @Injectable()
 export class MemberService {
   constructor(
-    @InjectModel('Member')
-    private readonly memberModel: Model<Member>,
+    @InjectModel('Member')private readonly memberModel: Model<Member>,
+    @InjectModel('Follow') private readonly followModel: Model<Follower | Following>,
     private authService: AuthService,
     private viewService: ViewService,
     private likeService: LikeService,
@@ -92,10 +93,18 @@ export class MemberService {
       //like
       const likeInput = {memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER};
       
-      targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput)
+      targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
+
+      // follow
+      targetMember.meFollowed = await this.Subscription(memberId, targetId);
 
     }
     return targetMember;
+  }
+
+  private async Subscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
+    const result = await this.followModel.findOne({followerId: followerId, followingId: followingId}).exec();
+    return result ? [{followingId: followingId, followerId: followerId, myFollowing: true }] : [];
   }
 
   public async getAgents(memberId: ObjectId, input: AgentsInpuiry): Promise<Members> {
