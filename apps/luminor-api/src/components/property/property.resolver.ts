@@ -4,11 +4,12 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
-import { UseGuards } from '@nestjs/common';
+import { Get, UseGuards } from '@nestjs/common';
 import { Properties, Property } from '../../libs/dto/property/property';
 import {
   AgentPropertiesInqury,
   AllPropertiesInquiry,
+  OrdineryInquiry,
   PropertiesInquiry,
   PropertyInput,
 } from '../../libs/dto/property/property.input';
@@ -85,6 +86,13 @@ export class PropertyResolver {
     console.log('Mutation: likeTargetProperty');
     const likeRefId = shapeIntoMongoObjectId(input);
     return await this.propertyService.likeTargetProperty(memberId, likeRefId)
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => Properties)
+  public async getFavorites(@Args('input') input: OrdineryInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Properties> {
+    console.log('Query: getFavorites');
+    return await this.propertyService.getFavorites(memberId, input)
   }
 
   /** ADMIN */
