@@ -43,9 +43,9 @@ export class BoardArticleResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => BoardArticles)
-  public async getBoardArticles(@Args('input') input: BoardArticlesInquiry): Promise<BoardArticles> {
+  public async getBoardArticles(@Args('input') input: BoardArticlesInquiry, @AuthMember('_id') memberId: ObjectId): Promise<BoardArticles> {
     console.log('Query: getBoardArticles');
-    return await this.boardArticleService.getBoardArticles(input);
+    return await this.boardArticleService.getBoardArticles(memberId, input);
   }
 
   @UseGuards(AuthGuard)
