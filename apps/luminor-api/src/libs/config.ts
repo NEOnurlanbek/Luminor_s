@@ -19,6 +19,7 @@ export const shapeIntoMongoObjectId = (target: any) => {
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { T } from './types/common';
+import { pipeline } from 'stream';
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 export const getSerialForImage = (filename: string) => {
   const ext = path.parse(filename).ext;
@@ -35,19 +36,52 @@ export const lookupMember = {
 };
 
 export const lookupFollowingData = {
-	$lookup: {
-		from: 'members',
-		localField: 'followingId',
-		foreignField: '_id',
-		as: 'followingData',
-	},
+  $lookup: {
+    from: 'members',
+    localField: 'followingId',
+    foreignField: '_id',
+    as: 'followingData',
+  },
 };
 
 export const lookupFollowerData = {
-	$lookup: {
-		from: 'members',
-		localField: 'followerId',
-		foreignField: '_id',
-		as: 'followerData',
-	},
+  $lookup: {
+    from: 'members',
+    localField: 'followerId',
+    foreignField: '_id',
+    as: 'followerData',
+  },
+};
+
+export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
+  return {
+    $lookup: {
+      from: 'likes',
+      let: {
+        localLikeRefId: targetRefId,
+        localMemberId: memberId,
+        localMyFavorite: true,
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+              { $eq: ['$likeRefId', '$$localLikeRefId'] }, 
+              { $eq: ['$memberId', '$$localMemberId'] }],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            memberId: 1,
+            likeRefId: 1,
+            myFavorite: '$$localMyFavorite',
+          }
+        }
+      ],
+      as: 'meLiked'
+    },
+  };
 };
