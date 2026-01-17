@@ -82,38 +82,51 @@ export class PropertyResolver {
 
   @UseGuards(AuthGuard)
   @Mutation(() => Property)
-  public async likeTargetProperty(@Args('propertyId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Property> {
+  public async likeTargetProperty(
+    @Args('propertyId') input: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Property> {
     console.log('Mutation: likeTargetProperty');
     const likeRefId = shapeIntoMongoObjectId(input);
-    return await this.propertyService.likeTargetProperty(memberId, likeRefId)
+    return await this.propertyService.likeTargetProperty(memberId, likeRefId);
   }
 
   @UseGuards(AuthGuard)
   @Query(() => Properties)
-  public async getFavorites(@Args('input') input: OrdineryInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Properties> {
+  public async getFavorites(
+    @Args('input') input: OrdineryInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
     console.log('Query: getFavorites');
-    return await this.propertyService.getFavorites(memberId, input)
+    return await this.propertyService.getFavorites(memberId, input);
   }
 
+  @UseGuards(AuthGuard)
+  @Query(() => Properties)
+  public async getVisited(
+    @Args('input') input: OrdineryInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
+    console.log('Query: getVisited');
+    return await this.propertyService.getVisited(memberId, input);
+  }
   /** ADMIN */
 
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
   @Query(() => Properties)
-  public async getAllPropertiesByAdmin(
-    @Args('input') input: AllPropertiesInquiry,
-  ): Promise<Properties> {
+  public async getAllPropertiesByAdmin(@Args('input') input: AllPropertiesInquiry): Promise<Properties> {
     console.log('Query: AllPropertiesInquriry');
-    return await this.propertyService.getAllPropertiesByAdmin(input)
+    return await this.propertyService.getAllPropertiesByAdmin(input);
   }
 
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
   @Mutation(() => Property)
-  public async updatePropertyByAdmin(@Args("input") input: PropertyUpdate): Promise<Property> {
+  public async updatePropertyByAdmin(@Args('input') input: PropertyUpdate): Promise<Property> {
     console.log('Mutation: updatePropertyByAdmin');
-    input._id = shapeIntoMongoObjectId(input._id)
-    return await this.propertyService.updatePropertyByAdmin(input)
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.propertyService.updatePropertyByAdmin(input);
   }
 
   @Roles(MemberType.ADMIN)
@@ -122,6 +135,6 @@ export class PropertyResolver {
   public async removePropertyByAdmin(@Args('propertyId') input: string): Promise<Property> {
     console.log('Mutation: removePropertyByAdmin');
     const propertyId = shapeIntoMongoObjectId(input);
-    return await this.propertyService.removePropertyByAdmin(propertyId)
+    return await this.propertyService.removePropertyByAdmin(propertyId);
   }
 }

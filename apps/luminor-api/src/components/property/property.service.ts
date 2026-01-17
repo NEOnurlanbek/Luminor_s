@@ -61,9 +61,9 @@ export class PropertyService {
         targetProperty.propertyViews++;
       }
 
-      const likeInput = {memberId: memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY};
-      
-      targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput)
+      const likeInput = { memberId: memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY };
+
+      targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput);
     }
 
     targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
@@ -154,6 +154,10 @@ export class PropertyService {
     return await this.likeService.getFavoriteProperties(memberId, input);
   }
 
+  public async getVisited(memberId: ObjectId, input: OrdineryInquiry): Promise<Properties> {
+    return await this.viewService.getVisitedProperties(memberId, input);
+  }
+
   public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInqury): Promise<Properties> {
     const { propertyStatus } = input.search;
     if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
@@ -194,7 +198,7 @@ export class PropertyService {
 
     const modifier: number = await this.likeService.toggleLike(input);
     const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'propertyLikes', modifier: modifier });
-    if(!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+    if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
     return result;
   }
 
