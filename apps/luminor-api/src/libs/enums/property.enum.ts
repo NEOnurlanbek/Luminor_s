@@ -24,7 +24,7 @@ export enum PropertyLocation {
     SEOUL = 'SEOUL',
     BUSAN = 'BUSAN',
     INCHEON = 'INCHEON',
-    DAEGU = 'DAIGU',
+    DAEGU = 'DAEGU',
     GYEONGJU = 'GYEONGJU',
 	GWANGJU = 'GWANGJU',
 	CHONJU = 'CHONJU',
