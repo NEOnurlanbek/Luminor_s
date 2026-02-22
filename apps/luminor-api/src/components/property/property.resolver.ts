@@ -7,9 +7,9 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { Get, UseGuards } from '@nestjs/common';
 import { Properties, Property } from '../../libs/dto/property/property';
 import {
-  AgentPropertiesInqury,
+  AgentPropertiesInquiry,
   AllPropertiesInquiry,
-  OrdineryInquiry,
+  OrdinaryInquiry,
   PropertiesInquiry,
   PropertyInput,
 } from '../../libs/dto/property/property.input';
@@ -73,7 +73,7 @@ export class PropertyResolver {
   @UseGuards(RolesGuard)
   @Query(() => Properties)
   public async getAgentProperties(
-    @Args('input') input: AgentPropertiesInqury,
+    @Args('input') input: AgentPropertiesInquiry,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Properties> {
     console.log('Query: getAgentProperties');
@@ -94,7 +94,7 @@ export class PropertyResolver {
   @UseGuards(AuthGuard)
   @Query(() => Properties)
   public async getFavorites(
-    @Args('input') input: OrdineryInquiry,
+    @Args('input') input: OrdinaryInquiry,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Properties> {
     console.log('Query: getFavorites');
@@ -104,7 +104,7 @@ export class PropertyResolver {
   @UseGuards(AuthGuard)
   @Query(() => Properties)
   public async getVisited(
-    @Args('input') input: OrdineryInquiry,
+    @Args('input') input: OrdinaryInquiry,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Properties> {
     console.log('Query: getVisited');

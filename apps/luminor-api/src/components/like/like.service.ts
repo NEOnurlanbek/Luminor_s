@@ -6,7 +6,7 @@ import { LikeInput } from '../../libs/dto/like/like.input';
 import { T } from '../../libs/types/common';
 import { Message } from '../../libs/enums/common.enum';
 import { Mutation } from '@nestjs/graphql';
-import { OrdineryInquiry } from '../../libs/dto/property/property.input';
+import { OrdinaryInquiry } from '../../libs/dto/property/property.input';
 import { Properties } from '../../libs/dto/property/property';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { lookupFavorite } from '../../libs/config';
@@ -41,7 +41,7 @@ export class LikeService {
     return result ? [{ memberId: memberId, likeRefId: likeRefId, myFavorite: true }] : [];
   }
 
-  public async getFavoriteProperties(memberId: ObjectId, input: OrdineryInquiry): Promise<Properties> {
+  public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
     const { page, limit } = input;
 
     const match: T = { likeGroup: LikeGroup.PROPERTY, memberId: memberId };

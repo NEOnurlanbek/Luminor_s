@@ -4,7 +4,7 @@ import { View } from '../../libs/dto/view/view';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { OrdineryInquiry } from '../../libs/dto/property/property.input';
+import { OrdinaryInquiry } from '../../libs/dto/property/property.input';
 import { Properties } from '../../libs/dto/property/property';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { lookupVisited } from '../../libs/config';
@@ -27,7 +27,7 @@ export class ViewService {
     return await this.viewModel.findOne(search).exec();
   }
 
-  public async getVisitedProperties(memberId: ObjectId, input: OrdineryInquiry): Promise<Properties> {
+  public async getVisitedProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
     const { page, limit } = input;
 
     const match: T = { viewGroup: ViewGroup.PROPERTY, memberId: memberId };

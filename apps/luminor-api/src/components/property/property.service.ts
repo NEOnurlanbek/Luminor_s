@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Properties, Property } from '../../libs/dto/property/property';
 import {
-  AgentPropertiesInqury,
+  AgentPropertiesInquiry,
   AllPropertiesInquiry,
-  OrdineryInquiry,
+  OrdinaryInquiry,
   PropertiesInquiry,
   PropertyInput,
 } from '../../libs/dto/property/property.input';
@@ -150,15 +150,15 @@ export class PropertyService {
     }
   }
 
-  public async getFavorites(memberId: ObjectId, input: OrdineryInquiry): Promise<Properties> {
+  public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
     return await this.likeService.getFavoriteProperties(memberId, input);
   }
 
-  public async getVisited(memberId: ObjectId, input: OrdineryInquiry): Promise<Properties> {
+  public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
     return await this.viewService.getVisitedProperties(memberId, input);
   }
 
-  public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInqury): Promise<Properties> {
+  public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {
     const { propertyStatus } = input.search;
     if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
     const match: T = { memberId: memberId, propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE } };
