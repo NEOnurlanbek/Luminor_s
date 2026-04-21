@@ -12,10 +12,10 @@ registerEnumType(BoardArticleCategory, {
 });
 
 export enum BoardArticleStatus {
-    ACTIVE = 'ACTIV',
-    DELETE = 'DELETE',
-  }
+	ACTIVE = 'ACTIVE',
+	DELETE = 'DELETE',
+}
 
-  registerEnumType(BoardArticleStatus, {
-    name: 'BoardArticleStatus',
-  });
+registerEnumType(BoardArticleStatus, {
+  name: 'BoardArticleStatus',
+});
